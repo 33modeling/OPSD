@@ -11,6 +11,12 @@
 
 **On-Policy Self-Distillation (OPSD)** trains a single model to act as both student and teacher by conditioning on different contexts — the student sees only the problem, while the teacher additionally sees the ground-truth solution — and performs token-level distribution matching along the student's own on-policy trajectories.
 
+> **Fork note (`33modeling/OPSD`).** This fork adds a group-volume A100 setup
+> layer using plain `venv` + `pip` only, with scripts for environment creation,
+> Qwen3 model download, dataset caching, preflight checks, training, and eval.
+> See [SETUP_A100.md](SETUP_A100.md). Upstream:
+> [siyan-zhao/OPSD](https://github.com/siyan-zhao/OPSD).
+
 
 ## Updates
 
