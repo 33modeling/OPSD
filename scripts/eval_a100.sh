@@ -2,7 +2,9 @@
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
-source scripts/setup_env_a100.sh "${OPSD_NUM_GPUS:-}"
+OPSD_SETUP_SCRIPT="${OPSD_SETUP_SCRIPT:-scripts/setup_env_a100.sh}"
+OPSD_PROFILE_LABEL="${OPSD_PROFILE_LABEL:-a100}"
+source "$OPSD_SETUP_SCRIPT" "${OPSD_NUM_GPUS:-}"
 opsd_activate
 
 MODEL_SIZE="${1:-1.7b}"

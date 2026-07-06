@@ -2,10 +2,12 @@
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
-source scripts/setup_env_a100.sh "${OPSD_NUM_GPUS:-}"
+OPSD_SETUP_SCRIPT="${OPSD_SETUP_SCRIPT:-scripts/setup_env_a100.sh}"
+OPSD_PROFILE_LABEL="${OPSD_PROFILE_LABEL:-a100}"
+source "$OPSD_SETUP_SCRIPT" "${OPSD_NUM_GPUS:-}"
 opsd_activate
 
-echo "[preflight] nvidia-smi"
+echo "[preflight_${OPSD_PROFILE_LABEL}] nvidia-smi"
 nvidia-smi || true
 
 python - <<'PY'
@@ -30,4 +32,4 @@ ds = load_dataset("siyanzhao/Openthoughts_math_30k_opsd", split="train[:2]")
 print("train_dataset_sample_rows", len(ds), "columns", ds.column_names)
 PY
 
-echo "[preflight] done"
+echo "[preflight_${OPSD_PROFILE_LABEL}] done"

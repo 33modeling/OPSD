@@ -2,24 +2,26 @@
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
-source scripts/setup_env_a100.sh "${OPSD_NUM_GPUS:-}"
+OPSD_SETUP_SCRIPT="${OPSD_SETUP_SCRIPT:-scripts/setup_env_a100.sh}"
+OPSD_PROFILE_LABEL="${OPSD_PROFILE_LABEL:-a100}"
+source "$OPSD_SETUP_SCRIPT" "${OPSD_NUM_GPUS:-}"
 
 PYTHON_BIN="${PYTHON_BIN:-python3.10}"
 if ! command -v "$PYTHON_BIN" >/dev/null 2>&1; then
   PYTHON_BIN=python3
 fi
 command -v "$PYTHON_BIN" >/dev/null 2>&1 || {
-  echo "[install_a100] python3 not found" >&2
+  echo "[install_${OPSD_PROFILE_LABEL}] python3 not found" >&2
   exit 1
 }
 
-echo "[install_a100] using $($PYTHON_BIN --version 2>&1) at $(command -v "$PYTHON_BIN")"
+echo "[install_${OPSD_PROFILE_LABEL}] using $($PYTHON_BIN --version 2>&1) at $(command -v "$PYTHON_BIN")"
 
 if [ ! -f "$OPSD_VENV/bin/activate" ]; then
-  echo "[install_a100] creating venv: $OPSD_VENV"
+  echo "[install_${OPSD_PROFILE_LABEL}] creating venv: $OPSD_VENV"
   "$PYTHON_BIN" -m venv "$OPSD_VENV"
 else
-  echo "[install_a100] reusing venv: $OPSD_VENV"
+  echo "[install_${OPSD_PROFILE_LABEL}] reusing venv: $OPSD_VENV"
 fi
 
 # shellcheck disable=SC1090
@@ -33,7 +35,7 @@ python -m pip install --upgrade pip wheel setuptools packaging ninja
 # Keep the upstream versions explicit. Override OPSD_TORCH_SPEC if the node's
 # NVIDIA driver cannot run the default torch wheel.
 OPSD_TORCH_SPEC="${OPSD_TORCH_SPEC:-torch==2.8.0}"
-echo "[install_a100] installing OPSD stack into venv"
+echo "[install_${OPSD_PROFILE_LABEL}] installing OPSD stack into venv"
 python -m pip install \
   "$OPSD_TORCH_SPEC" \
   accelerate==1.11.0 \
@@ -55,10 +57,10 @@ python -m pip install \
   "huggingface_hub[cli]"
 
 if [ "${OPSD_SKIP_FLASH_ATTN:-0}" != "1" ]; then
-  echo "[install_a100] installing flash-attn==2.8.3"
+  echo "[install_${OPSD_PROFILE_LABEL}] installing flash-attn==2.8.3"
   python -m pip install flash-attn==2.8.3 --no-build-isolation
 else
-  echo "[install_a100] skipping flash-attn because OPSD_SKIP_FLASH_ATTN=1"
+  echo "[install_${OPSD_PROFILE_LABEL}] skipping flash-attn because OPSD_SKIP_FLASH_ATTN=1"
 fi
 
 python - <<'PY'
@@ -71,4 +73,4 @@ import torch
 print("torch.cuda:", torch.version.cuda, "available:", torch.cuda.is_available())
 PY
 
-echo "[install_a100] done"
+echo "[install_${OPSD_PROFILE_LABEL}] done"

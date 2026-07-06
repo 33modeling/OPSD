@@ -2,7 +2,9 @@
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
-source scripts/setup_env_a100.sh "${OPSD_NUM_GPUS:-}"
+OPSD_SETUP_SCRIPT="${OPSD_SETUP_SCRIPT:-scripts/setup_env_a100.sh}"
+OPSD_PROFILE_LABEL="${OPSD_PROFILE_LABEL:-a100}"
+source "$OPSD_SETUP_SCRIPT" "${OPSD_NUM_GPUS:-}"
 opsd_activate
 
 export HF_HUB_OFFLINE=0 HF_DATASETS_OFFLINE=0 TRANSFORMERS_OFFLINE=0
@@ -34,4 +36,4 @@ if "eval" in tasks:
     show("meituan-longcat/AMO-Bench", "test")
 PY
 
-echo "[download_data_a100] HF cache: $HF_HOME"
+echo "[download_data_${OPSD_PROFILE_LABEL}] HF cache: $HF_HOME"

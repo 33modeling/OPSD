@@ -2,7 +2,9 @@
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
-source scripts/setup_env_a100.sh "${OPSD_NUM_GPUS:-}"
+OPSD_SETUP_SCRIPT="${OPSD_SETUP_SCRIPT:-scripts/setup_env_a100.sh}"
+OPSD_PROFILE_LABEL="${OPSD_PROFILE_LABEL:-a100}"
+source "$OPSD_SETUP_SCRIPT" "${OPSD_NUM_GPUS:-}"
 opsd_activate
 
 WHAT="${1:-1.7b}"
@@ -33,7 +35,7 @@ case "$WHAT" in
     _fetch "$HFID_QWEN3_4B"  "$MODEL_PATH_QWEN3_4B"
     _fetch "$HFID_QWEN3_8B"  "$MODEL_PATH_QWEN3_8B"
     ;;
-  *) echo "usage: bash scripts/download_models_a100.sh {1.7b|4b|8b|all}" >&2; exit 2 ;;
+  *) echo "usage: bash scripts/download_models_${OPSD_PROFILE_LABEL}.sh {1.7b|4b|8b|all}" >&2; exit 2 ;;
 esac
 
-echo "[download_models_a100] done: $WHAT"
+echo "[download_models_${OPSD_PROFILE_LABEL}] done: $WHAT"

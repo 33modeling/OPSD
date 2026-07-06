@@ -2,7 +2,9 @@
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
-source scripts/setup_env_a100.sh "${OPSD_NUM_GPUS:-}"
+OPSD_SETUP_SCRIPT="${OPSD_SETUP_SCRIPT:-scripts/setup_env_a100.sh}"
+OPSD_PROFILE_LABEL="${OPSD_PROFILE_LABEL:-a100}"
+source "$OPSD_SETUP_SCRIPT" "${OPSD_NUM_GPUS:-}"
 opsd_activate
 
 MODEL_SIZE="${1:-1.7b}"
@@ -45,7 +47,7 @@ NUM_EPOCHS="${OPSD_NUM_TRAIN_EPOCHS:-30}"
 SAVE_STEPS="${OPSD_SAVE_STEPS:-25}"
 LOGGING_STEPS="${OPSD_LOGGING_STEPS:-2}"
 MASTER_PORT="${MASTER_PORT:-12949}"
-RUN_CONFIG="${OPSD_RUN_CONFIG:-${MODEL_TAG}_a100_g${OPSD_NUM_GPUS}_gen${MAX_COMPLETION}_opsd}"
+RUN_CONFIG="${OPSD_RUN_CONFIG:-${MODEL_TAG}_${OPSD_PROFILE_LABEL}_g${OPSD_NUM_GPUS}_gen${MAX_COMPLETION}_opsd}"
 
 EXTRA_ARGS=()
 if [ -n "${OPSD_MAX_STEPS:-}" ]; then
@@ -57,9 +59,9 @@ export HF_HUB_OFFLINE="${HF_HUB_OFFLINE:-1}"
 export HF_DATASETS_OFFLINE="${HF_DATASETS_OFFLINE:-1}"
 export TRANSFORMERS_OFFLINE="${TRANSFORMERS_OFFLINE:-1}"
 
-echo "[run_opsd_a100] model=$MODEL_PATH"
-echo "[run_opsd_a100] gpus=$CUDA_VISIBLE_DEVICES processes=$OPSD_NUM_GPUS bs=$PER_DEVICE_BS grad_accum=$GRAD_ACCUM"
-echo "[run_opsd_a100] output=$OPSD_OUTPUT_ROOT run_config=$RUN_CONFIG"
+echo "[run_opsd_${OPSD_PROFILE_LABEL}] model=$MODEL_PATH"
+echo "[run_opsd_${OPSD_PROFILE_LABEL}] gpus=$CUDA_VISIBLE_DEVICES processes=$OPSD_NUM_GPUS bs=$PER_DEVICE_BS grad_accum=$GRAD_ACCUM"
+echo "[run_opsd_${OPSD_PROFILE_LABEL}] output=$OPSD_OUTPUT_ROOT run_config=$RUN_CONFIG"
 
 accelerate launch \
   --config_file "$OPSD_ACCELERATE_CONFIG" \
