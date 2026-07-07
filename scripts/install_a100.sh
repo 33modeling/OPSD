@@ -34,10 +34,19 @@ python -m pip install --upgrade pip wheel setuptools packaging ninja
 
 # Keep the upstream versions explicit. Override OPSD_TORCH_SPEC if the node's
 # NVIDIA driver cannot run the default torch wheel.
+# Compatibility matrix (verified against PyPI release metadata, 2026-07):
+#   vllm==0.11.0 pins torch==2.8.0 / torchvision==0.23.0 / torchaudio==2.8.0 /
+#   xformers==0.0.32.post1 and needs transformers>=4.55.2. trl==0.26.0 needs
+#   transformers>=4.56.1 and supports vllm>=0.10.2,<0.12.0 (so 0.11.0 is in range).
+#   torchvision/torchaudio are pinned explicitly so the resolver cannot pull a
+#   torch-family wheel that mismatches torch 2.8.0. This fork uses TRL (vLLM
+#   colocate), not verl.
 OPSD_TORCH_SPEC="${OPSD_TORCH_SPEC:-torch==2.8.0}"
 echo "[install_${OPSD_PROFILE_LABEL}] installing OPSD stack into venv"
 python -m pip install \
   "$OPSD_TORCH_SPEC" \
+  torchvision==0.23.0 \
+  torchaudio==2.8.0 \
   accelerate==1.11.0 \
   transformers==4.57.1 \
   trl==0.26.0 \

@@ -7,8 +7,16 @@ channels:
 dependencies:
   - python=3.10
   - pip
+  # Compatibility matrix (verified against PyPI release metadata, 2026-07):
+  #   vllm==0.11.0 pins: torch==2.8.0, torchvision==0.23.0, torchaudio==2.8.0,
+  #                      xformers==0.0.32.post1, transformers>=4.55.2 (Python <3.14,>=3.9)
+  #   trl==0.26.0  needs: transformers>=4.56.1, accelerate>=1.4.0, datasets>=3.0.0,
+  #                      and its [vllm] extra allows vllm>=0.10.2,<0.12.0 (0.11.0 OK)
+  #   torch 2.8.0 ships triton 3.4.0. This fork uses TRL's vLLM colocate mode, not verl.
   - pip:
     - torch==2.8.0
+    - torchvision==0.23.0
+    - torchaudio==2.8.0
     - accelerate==1.11.0
     - transformers==4.57.1
     - trl==0.26.0
